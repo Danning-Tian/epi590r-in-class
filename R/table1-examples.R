@@ -77,4 +77,42 @@ tbl_summary(
   # replace the column headers and make them bold
   modify_header(label = "**Variable**", p.value = "**P**")
 
+#exercise
+#3
+tbl_summary(nlsy,
+						by = sex_cat,
+						include = c(region_cat,race_eth_cat,income, contains("sleep")),
+						label = list(
+							region_cat ~ "Region",
+							race_eth_cat ~ "Race/Ethnicity",
+							income ~ "Income",
+							sleep_wkdy ~ "Sleep on weekdays",
+							sleep_wknd ~ "Sleep on weekends"
+						),
+						type = list(income = "continuous2",sleep_wknd = "continuous2",sleep_wkdy = "continuous2"),
+						statistic = list(
+							income ~ c(
+							"{median} ({p10}, {p90})"
+						),
+							contains("sleep") ~ c(
+								"{min}, {max}"
+							)),
+						digits = list(income ~ c(1,3,3),
+													contains("sleep") ~ c(1,1)),
+						missing_text = "Missing"
+						) |>
+#4
+add_p(test = list(
+	all_continuous() ~ "t.test",
+	all_categorical() ~ "chisq.test"
+)) |>
+	add_overall(col_label = "**Total** N = {N}") |>
+	bold_labels() |>
+	# remove the default footnotes
+	modify_footnote(update = everything() ~ NA) |>
+	# replace the column headers and make them bold
+	modify_header(label = "**Variable**", p.value = "**P**") |>
+#5
+	as_gt() |>
+	gt::tab_source_note(gt::md("Click to see how NLSY classified participants: https://www.nlsinfo.org/content/cohorts/nlsy79/topical-guide/household/race-ethnicity-immigration-data"))
 
